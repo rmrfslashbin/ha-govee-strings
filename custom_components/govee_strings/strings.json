@@ -1,12 +1,83 @@
 {
   "config": {
+    "flow_title": "{sku} at {ip}",
     "step": {
       "user": {
-        "description": "Set up local, per-bulb control of Govee string lights. This replaces the built-in Govee lights local integration, which must be disabled first."
+        "description": "Found {count} Govee light(s) on the LAN that are not set up yet. The built-in Govee lights local integration must be disabled first, because both need UDP port 4002.",
+        "data": { "device_id": "Light" }
+      },
+      "manual": {
+        "description": "Enter the light's IP address. LAN Control must be on for it in the Govee app.",
+        "data": { "host": "[%key:common::config_flow::data::host%]" }
+      },
+      "bulbs": {
+        "description": "How many bulbs does the {sku} at {ip} have? The light can't report this, because the same model ships in different lengths. Count them, or test with a pattern.",
+        "data": { "bulb_count": "Bulb count" }
       }
     },
+    "error": {
+      "no_answer": "No Govee light answered at that address. Check that LAN Control is on in the Govee app."
+    },
     "abort": {
-      "single_instance_allowed": "[%key:common::config_flow::abort::single_instance_allowed%]"
+      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]",
+      "port_in_use": "UDP port 4002 is in use, probably by the built-in Govee lights local integration. Disable it, then try again."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "bulb_count": "Bulb count",
+          "enforce_interval": "Re-send interval when enforcing"
+        }
+      }
+    }
+  },
+  "entity": {
+    "light": { "bulb": { "name": "Bulb {number}" } },
+    "select": { "pattern": { "name": "Pattern" } },
+    "switch": { "enforce": { "name": "Enforce pattern" } }
+  },
+  "selector": {
+    "fit": {
+      "options": {
+        "exact": "Exact bulb count only",
+        "repeat": "Repeat to fill",
+        "truncate": "Cut to fit"
+      }
+    }
+  },
+  "services": {
+    "paint": {
+      "name": "Paint bulbs",
+      "description": "Set the color, brightness or power of some bulbs. Bulbs with the same value share one command.",
+      "fields": {
+        "device_id": { "name": "String", "description": "The Govee string." },
+        "runs": { "name": "Runs", "description": "A list of runs: bulbs (e.g. \"1-15,17\" or [1, 2]) plus any of rgb, brightness (1-100) and on." }
+      }
+    },
+    "save_pattern": {
+      "name": "Save pattern",
+      "description": "Save a per-bulb pattern, either from a string's current state or from an explicit list of bulbs.",
+      "fields": {
+        "name": { "name": "Name", "description": "Pattern name. An existing pattern with this name is replaced." },
+        "device_id": { "name": "String", "description": "Save this string's current state." },
+        "bulbs": { "name": "Bulbs", "description": "Explicit bulbs, in order: rgb, plus optional brightness and on." }
+      }
+    },
+    "apply_pattern": {
+      "name": "Apply pattern",
+      "description": "Apply a saved pattern to a string.",
+      "fields": {
+        "device_id": { "name": "String", "description": "The Govee string." },
+        "name": { "name": "Name", "description": "The saved pattern." },
+        "fit": { "name": "Fit", "description": "What to do when the pattern's bulb count differs from the string's." }
+      }
+    },
+    "delete_pattern": {
+      "name": "Delete pattern",
+      "description": "Delete a saved pattern.",
+      "fields": { "name": { "name": "Name", "description": "The saved pattern." } }
     }
   }
 }

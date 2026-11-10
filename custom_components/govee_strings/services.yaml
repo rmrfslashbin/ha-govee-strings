@@ -1,0 +1,52 @@
+paint:
+  fields:
+    device_id:
+      required: true
+      selector:
+        device:
+          integration: govee_strings
+    runs:
+      required: true
+      example: '[{"bulbs": "1-15", "rgb": [0, 255, 255], "brightness": 60}, {"bulbs": [2], "on": false}]'
+      selector:
+        object:
+save_pattern:
+  fields:
+    name:
+      required: true
+      selector:
+        text:
+    device_id:
+      selector:
+        device:
+          integration: govee_strings
+    bulbs:
+      example: '[{"rgb": [255, 165, 85], "brightness": 14}, {"rgb": [175, 45, 10], "brightness": 16}]'
+      selector:
+        object:
+apply_pattern:
+  fields:
+    device_id:
+      required: true
+      selector:
+        device:
+          integration: govee_strings
+    name:
+      required: true
+      selector:
+        text:
+    fit:
+      default: exact
+      selector:
+        select:
+          options:
+            - exact
+            - repeat
+            - truncate
+          translation_key: fit
+delete_pattern:
+  fields:
+    name:
+      required: true
+      selector:
+        text:

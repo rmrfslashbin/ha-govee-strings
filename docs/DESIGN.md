@@ -1,6 +1,6 @@
 # Design: ha-govee-strings v1
 
-**Status:** draft, for review. No feature code is written until this is agreed.
+**Status:** approved 2026-11-09 and built as v0.1.0. It has not been tested against hardware or a live HA yet.
 
 ## Goal
 
@@ -27,29 +27,44 @@ account, no cloud and no Bluetooth, and it replaces the built-in `govee_light_lo
 
 ## Architecture
 
-- **One hub config entry** owns a single UDP listener on 4002. Two listeners on that
-  port split replies at random, which is why this replaces `govee_light_local` instead
-  of running beside it.
-- **Discovery:** repeated multicast scans. Each new SKU and MAC appears as a discovered
-  device for the user to confirm. A device stays known when it misses a scan. Manual IPs
-  are supported for strings on another subnet.
-- **Per-string settings** (options flow): bulb count (required, no default), and
-  enforce on/off with an interval.
+- **One config entry per string**, each with its own bulb count. All of them share one
+  UDP transport that owns 4002, reference-counted across entries and config flows.
+  (The draft said one hub entry. Per-string entries give HA-native discovery, options and
+  reload for free.)
+- **Port conflict is a hard stop, never a quiet split.** The transport binds without
+  `SO_REUSEADDR`/`SO_REUSEPORT`: on Linux, two UDP sockets that both set `SO_REUSEADDR`
+  may share a port. Setup also refuses while a `govee_light_local` entry is loaded. Both
+  cases surface as "port in use" (setup retry, or a flow abort).
+- **Discovery:** a scan is sent 3 times over 3 s, because multicast is lossy. It runs
+  every 5 minutes while any entry is loaded. A new string raises an integration
+  discovery flow. A known string that changed IP (DHCP) is updated without a reload.
+  Manual IPs are supported.
+- **Per-string settings:** bulb count, required when the string is added (no default),
+  and the enforce interval. Both are in the options flow, and a change reloads the entry.
 - **Transport:** our own small async UDP client. `govee-local-api` reaches only 15
-  bulbs, has no per-bulb brightness, and its model table is wrong for these strings. The
-  protocol is small, so taking on that dependency would cost more than it saves.
+  bulbs, has no per-bulb brightness, and its model table is wrong for these strings.
+- **Status:** `devStatus` every 30 s, for power and whole-string brightness only. Three
+  misses in a row mark the string unavailable.
+- **Setup never sends anything to a light.**
 
 ## Entities, per string
 
 | Entity | Purpose |
 |---|---|
 | `light.<string>` | The whole string: on/off, brightness, RGB, and color temperature where supported |
-| `light.<string>_bulb_<n>` | One bulb: RGB and brightness. Turning a bulb "off" sets its brightness to 0 |
-| `select.<string>_pattern` | Applies a saved pattern |
+| `light.<string>_bulb_<n>` | One bulb: RGB and brightness. "Off" paints it black, and "on" restores its color. **Disabled by default**, see below |
+| `select.<string>_pattern` | Shows the applied pattern; picking one applies it. HA scenes can set it, so a scene can hold a per-bulb look |
 | `switch.<string>_enforce` | "HA owns the config": re-sends the known state |
 
 All state is **assumed**: HA shows what it last sent. This is stated on the entities
-(`assumed_state`), not hidden.
+(`assumed_state`), not hidden. Per-bulb state is persisted in `.storage`, so it
+survives an HA restart.
+
+**Why per-bulb lights are disabled by default:** label and device targets include every
+enabled entity of a device. The sunset/sunrise automation targets a device label, so
+with bulbs enabled it would send up to 56 per-bulb commands per string, twice a day.
+Disabled entities are skipped. A paint that changes nothing sends nothing and keeps the
+active pattern.
 
 ## Actions
 
@@ -106,6 +121,12 @@ Each step is a separate, approved batch, and its blast radius is stated before i
 
 Govee app scenes (they need the cloud), music mode, animation, per-bulb readback, and
 Bluetooth transport.
+
+## Not yet verified against hardware
+
+- Bulb "off" as black (`00 00 00`). The frame is the same one used for colors, but
+  black was never sent in the spike.
+- Several frames back to back at 250 ms. Each spike test sent frames one at a time.
 
 ## Open questions
 
