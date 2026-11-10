@@ -100,8 +100,10 @@ Starting state (2026-11-09):
   `string_lights`), not by entity ID.
 
 Steps:
-0. Capture the current patterns as saved patterns, from the palettes that set them,
-   because the device can't report them.
+0. Seed all **four** saved patterns from `govee-patterns/` in the (private) workspace
+   repo: `november-night-45` (Loop, Fence), `november-night-30` (Back Porch),
+   `front-porch-colorful-30` and `sauna-alpine-winter-15`. The device can't report
+   them. Both 30-bulb strings need their own pattern.
 1. Disable the `govee_light_local` config entry. Its sockets close, freeing 4002.
 2. Rename its light entities aside (`*_core_old`) so the new ones can take the existing
    entity IDs. Dashboards and automations then keep working.
