@@ -1,0 +1,12 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "description": "Set up local, per-bulb control of Govee string lights. This replaces the built-in Govee lights local integration, which must be disabled first."
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Already configured. Only a single configuration is possible."
+    }
+  }
+}

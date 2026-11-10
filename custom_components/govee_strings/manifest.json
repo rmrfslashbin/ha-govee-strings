@@ -1,0 +1,14 @@
+{
+  "domain": "govee_strings",
+  "name": "Govee Strings (LAN)",
+  "codeowners": ["@rmrfslashbin"],
+  "config_flow": true,
+  "documentation": "https://github.com/rmrfslashbin/ha-govee-strings",
+  "integration_type": "hub",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/rmrfslashbin/ha-govee-strings/issues",
+  "loggers": ["custom_components.govee_strings"],
+  "requirements": [],
+  "single_config_entry": true,
+  "version": "0.0.1"
+}

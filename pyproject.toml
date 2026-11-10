@@ -1,0 +1,37 @@
+[project]
+name = "ha-govee-strings"
+version = "0.0.1"
+description = "Home Assistant (HACS) integration: local, per-bulb control of Govee string lights over the LAN API"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.14.2"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    # Pins Home Assistant itself; bump together with hacs.json "homeassistant".
+    "pytest-homeassistant-custom-component==0.13.375",
+    "ruff>=0.14",
+    "mypy>=1.18",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py314"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "RUF", "ASYNC", "PL"]
+ignore = ["PLR2004"]
+
+[tool.mypy]
+python_version = "3.14"
+strict = true
+packages = ["custom_components.govee_strings"]
