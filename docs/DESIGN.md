@@ -76,11 +76,27 @@ All state is **assumed**: HA shows what it last sent. This is stated on the enti
 
 ## Cutover and rollback (the risky part)
 
+Starting state (2026-11-09):
+- Entity IDs: `light.front_porch_string_lights`, `light.back_porch_string_lights`,
+  `light.sauna_string_lights`, `light.backyard_loop_string_lights` and
+  `light.backyard_fence_string_lights`.
+- Every string is showing a per-bulb pattern Robert chose, set by hand over LAN.
+- The sunset/sunrise automation targets devices by **label** (`outdoor_lights`,
+  `string_lights`), not by entity ID.
+
+Steps:
+0. Capture the current patterns as saved patterns, from the palettes that set them,
+   because the device can't report them.
 1. Disable the `govee_light_local` config entry. Its sockets close, freeing 4002.
 2. Rename its light entities aside (`*_core_old`) so the new ones can take the existing
    entity IDs. Dashboards and automations then keep working.
-3. Add this integration and confirm each string.
-4. Soak period. Then delete the old entry.
+3. Add this integration and confirm each string. **Setup never sends anything to a
+   light**, and enforce is off by default, so the patterns survive cutover.
+4. Put the `outdoor_lights` and `string_lights` labels on the new devices. Without
+   them, the sunset/sunrise automation silently stops driving the strings. Verify
+   the automation's targets resolve.
+5. Soak period. Then delete the old entry. That also removes the orphan device of the
+   dead H7039 `…3C80`, which `govee_light_local` refuses to remove on its own.
 
 **Rollback:** disable this entry, rename the IDs back, and re-enable the old one.
 
@@ -95,7 +111,9 @@ Bluetooth transport.
 
 1. Per-bulb readback over Bluetooth through HA's proxies: v2 candidate. It depends on
    the phone-Bluetooth-off test.
-2. Whether enforce re-sends flicker.
+2. Whether enforce re-sends flicker, and whether per-bulb state survives the nightly
+   off/on cycle. If it doesn't, enforce on reappearance or turn-on becomes required,
+   not optional.
 3. ~~Shed to Fence to Sauna (H7039, `…3C80`) does not answer discovery.~~ Resolved
    2026-11-09: that string died and was replaced. Its HA device is an orphan with no
    entities. The house has five strings, all on one subnet.
