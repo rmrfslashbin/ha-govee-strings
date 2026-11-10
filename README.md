@@ -1,6 +1,6 @@
 # ha-govee-strings
 
-A Home Assistant custom integration, installable through HACS, for **local, per-bulb control of Govee
+A Home Assistant custom integration, in HACS repository format, for **local, per-bulb control of Govee
 string lights**. It uses the Govee LAN API. It needs no Govee account, no cloud and no Bluetooth.
 
 The built-in `govee_light_local` integration controls only a whole string. These lights accept a
@@ -30,6 +30,12 @@ reply port (4002).
 | H7039 | 45 | yes | yes |
 
 The bulb count is set per string, because the same model ships in different lengths.
+
+## Installing
+
+Home Assistant 2026.11 replaced HACS with the built-in Marketplace. Add this repository
+there as a custom repository. (Not yet verified end to end. Older installs use HACS the
+same way.)
 
 ## Requirements
 
