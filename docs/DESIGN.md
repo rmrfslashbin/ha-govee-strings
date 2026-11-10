@@ -96,5 +96,6 @@ Bluetooth transport.
 1. Per-bulb readback over Bluetooth through HA's proxies: v2 candidate. It depends on
    the phone-Bluetooth-off test.
 2. Whether enforce re-sends flicker.
-3. Shed to Fence to Sauna (H7039, `…3C80`) does not answer discovery even with LAN
-   Control on. Power, Wi-Fi, or another subnet?
+3. ~~Shed to Fence to Sauna (H7039, `…3C80`) does not answer discovery.~~ Resolved
+   2026-11-09: that string died and was replaced. Its HA device is an orphan with no
+   entities. The house has five strings, all on one subnet.
