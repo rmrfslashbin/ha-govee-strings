@@ -17,8 +17,6 @@ jobs:
       - uses: hacs/action@main
         with:
           category: integration
-          # Not listed in home-assistant/brands; HACS installs it as a custom repository.
-          ignore: brands
   hassfest:
     runs-on: ubuntu-latest
     steps:
