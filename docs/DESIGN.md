@@ -124,11 +124,15 @@ Each step is a separate, approved batch, and its blast radius is stated before i
 Govee app scenes (they need the cloud), music mode, animation, per-bulb readback, and
 Bluetooth transport.
 
-## Not yet verified against hardware
+## Verified against hardware on 2026-11-10 (H7025 sauna string, watched by eye)
 
-- Bulb "off" as black (`00 00 00`). The frame is the same one used for colors, but
-  black was never sent in the spike.
-- Several frames back to back at 250 ms. Each spike test sent frames one at a time.
+- Bulb "off" as black (`00 00 00`): bulbs 8-15 painted black went fully dark,
+  with no residual glow, while bulbs 1-7 stayed white at 30%.
+- Burst frames: 15 separate `ptReal` messages, one bulb each, 250 ms apart, starting from
+  a known white/black state. All 15 bulbs changed, and none were dropped.
+- Restore from a saved pattern: `sauna-alpine-winter-15`, grouped into 8 frames.
+
+Not covered: a burst on a 45-bulb H7039, or intervals below 250 ms.
 
 ## Open questions
 
