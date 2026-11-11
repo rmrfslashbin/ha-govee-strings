@@ -15,7 +15,10 @@ This integration exposes that.
 - **Whole-string light:** on/off, brightness, RGB, and color temperature where the model
   supports it.
 - **Per-bulb lights** (`Bulb 1` … `Bulb N`): RGB and brightness. Disabled by default;
-  enable the ones you want.
+  enable the ones you want. An enabled bulb belongs to the string's device, so an automation
+  that targets lights by device **label or area** reaches it too. Turning one bulb off on its
+  own clears the string's pattern select (it shows `unknown`) even though the other bulbs are
+  unchanged. Keep bulbs disabled unless you need them, or target the whole-string entity.
 - **Pattern select:** applies a saved per-bulb pattern. HA scenes can set it.
 - **Enforce pattern switch:** re-sends the known state on a timer, when the string comes
   back online, and when it's turned on. It never turns a string on.
